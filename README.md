@@ -1,17 +1,85 @@
-# React + Vite
+# Evenflow Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application frontend de billetterie événementielle construite avec React, Vite et Tailwind CSS.
 
-Currently, two official plugins are available:
+## Stack technique
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18
+- Vite 5
+- React Router DOM 6
+- Tailwind CSS 3
+- Framer Motion
 
-## React Compiler
+## Prérequis
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 18+
+- npm 9+
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# Evenflow
+```bash
+npm install
+```
+
+## Lancer le projet en local
+
+```bash
+npm run dev
+```
+
+Le serveur démarre par défaut sur `http://localhost:5173`.
+
+## Scripts disponibles
+
+- `npm run dev` : lance le serveur de développement
+- `npm run build` : génère le build de production dans `dist/`
+- `npm run preview` : prévisualise le build de production localement
+- `npm run lint` : lance ESLint sur `src`
+- `npm run format` : formate les fichiers avec Prettier
+- `npm run deploy` : build puis déploiement GitHub Pages (si configuré)
+
+## Structure principale
+
+```text
+src/
+	api/                 # Configuration axios
+	components/          # UI, layout, sections, features
+	constants/           # Constantes globales
+	context/             # AuthContext, CartContext
+	hooks/               # Hooks personnalisés (ex: useAuth)
+	mock-data/           # Données mock
+	pages/               # Pages publiques + auth
+	services/            # Services applicatifs
+	styles/              # Styles globaux Tailwind/CSS
+	utils/               # Utilitaires
+```
+
+## Routage actuel
+
+- `/` : accueil
+- `/events` : listing des événements
+- `/events/:id` : détail d’un événement
+- `/login` : connexion
+- `/register` : inscription
+
+## Authentification (mode mock)
+
+Le projet utilise actuellement une authentification simulée via `AuthContext` avec persistance locale :
+
+- utilisateur stocké dans `localStorage` sous la clé `evenflow_user`
+- fonctions exposées : `login`, `register`, `logout`
+- redirection automatique après connexion/inscription vers la page d’accueil
+
+## Notes de développement
+
+- Les pages d’authentification (`/login`, `/register`) sont fonctionnelles côté frontend.
+- Le backend/API d’auth réel n’est pas encore branché.
+- Le design repose sur des classes utilitaires Tailwind + quelques classes globales définies dans `src/styles/globals.css`.
+
+## Build vérifié
+
+Le build de production a été validé avec succès via :
+
+```bash
+npm run build
+```

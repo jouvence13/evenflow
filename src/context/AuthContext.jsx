@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+    const [loading] = useState(false);
     const [user, setUser] = useState(() => {
         try {
             const savedUser = localStorage.getItem('evenflow_user');
@@ -56,6 +57,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        loading,
         isAuthenticated: !!user
     };
 
