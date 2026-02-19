@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import HeroSection from '../../../components/sections/HeroSection';
@@ -12,6 +13,7 @@ import MagneticButton from '../../../components/ui/buttons/MagneticButton';
 import { ArrowRight } from 'lucide-react';
 
 const HomePage = () => {
+    const navigate = useNavigate();
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -90,14 +92,15 @@ const HomePage = () => {
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
                     >
-                        <Link to="/register">
-                            <MagneticButton className="group bg-red-600 text-white px-12 py-6 rounded-full font-black text-lg uppercase tracking-widest shadow-2xl shadow-red-600/30 hover:shadow-red-600/50 transition-all">
-                                <span className="flex items-center gap-3">
-                                    Créer un compte
-                                    <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                                </span>
-                            </MagneticButton>
-                        </Link>
+                        <MagneticButton
+                            className="group bg-red-600 text-white px-12 py-6 rounded-full font-black text-lg uppercase tracking-widest shadow-2xl shadow-red-600/30 hover:shadow-red-600/50 transition-all"
+                            onClick={() => navigate('/register')}
+                        >
+                            <span className="flex items-center gap-3">
+                                Créer un compte
+                                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                            </span>
+                        </MagneticButton>
                     </motion.div>
                 </div>
             </section>

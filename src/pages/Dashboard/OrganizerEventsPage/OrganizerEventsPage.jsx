@@ -196,7 +196,7 @@ const OrganizerEventsPage = () => {
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <img
-                            src={event.images?.main || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=320&h=160&fit=crop'}
+                            src={event.images?.main || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=900&h=380&fit=crop'}
                             alt={event.title}
                             className="w-24 h-20 object-cover rounded-xl"
                           />

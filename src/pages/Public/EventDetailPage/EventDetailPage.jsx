@@ -81,7 +81,7 @@ const EventDetailPage = () => {
             {/* Hero Banner Section */}
             <div className="relative h-[60vh] w-full overflow-hidden">
                 <img
-                    src={selectedImage || event?.images?.main || event?.image}
+                    src={selectedImage || event?.images?.main || event?.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=900&h=380&fit=crop'}
                     alt={event.title}
                     className="w-full h-full object-cover"
                 />
@@ -136,7 +136,7 @@ const EventDetailPage = () => {
                                             onClick={() => setSelectedImage(imageUrl)}
                                             className={`rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === imageUrl ? 'border-primary shadow-lg shadow-primary/20' : 'border-gray-100 hover:border-primary/30'}`}
                                         >
-                                            <img src={imageUrl} alt={event.title} className="w-full h-28 object-cover" />
+                                            <img src={imageUrl || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=900&h=380&fit=crop'} alt={event.title} className="w-full h-28 object-cover" />
                                         </button>
                                     ))}
                                 </div>
@@ -195,7 +195,7 @@ const EventDetailPage = () => {
                         )}
 
                         <div className="flex items-center gap-8 p-10 glass-panel rounded-[3rem] border-slate-100">
-                            <img src={event.organizer.logo} alt={event.organizer.name} className="w-24 h-24 rounded-3xl object-cover shadow-2xl" />
+                            <img src={event.organizer.logo || 'https://ui-avatars.com/api/?name=Organisateur&background=random'} alt={event.organizer.name} className="w-24 h-24 rounded-3xl object-cover shadow-2xl" />
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <h4 className="text-xl font-black uppercase italic tracking-tight">{event.organizer.name}</h4>

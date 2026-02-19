@@ -16,7 +16,7 @@ const UserDropdown = ({ user, logout }) => {
         <div className="relative group">
             <button className="flex items-center gap-3 p-1 rounded-full hover:bg-gray-100 transition-all">
                 <img
-                    src={user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop'}
+                    src={user.avatar || 'https://ui-avatars.com/api/?name=Utilisateur&background=random'}
                     alt={user.name}
                     className="w-10 h-10 rounded-full border-2 border-primary/20"
                 />

@@ -87,7 +87,7 @@ const BuyerDashboard = () => {
                 </div>
 
                 <img
-                  src={ticket.eventImage || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=350&fit=crop'}
+                  src={ticket.eventImage || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=900&h=380&fit=crop'}
                   alt={ticket.eventTitle}
                   className="mt-4 w-full h-36 object-cover rounded-2xl border border-gray-100"
                 />

@@ -9,7 +9,7 @@ const EventCard = ({ event }) => {
                 {/* Image Section */}
                 <div className="relative h-60 -mt-2 -mx-2 rounded-[1.5rem] overflow-hidden mb-6">
                     <img
-                        src={event.image}
+                        src={event.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=900&h=380&fit=crop'}
                         alt={event.title}
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                     />

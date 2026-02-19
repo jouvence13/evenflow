@@ -65,6 +65,7 @@ const CartDrawer = () => {
     const fees = Math.round(subtotal * 0.05); // 5% de frais
     const total = subtotal + fees;
 
+    // Paiement simple (sans FedaPay)
     const handleCheckout = () => {
         if (!user) {
             warning('Connectez-vous pour finaliser votre achat.');
@@ -72,11 +73,9 @@ const CartDrawer = () => {
             navigate('/login');
             return;
         }
-
         const createdTickets = purchaseFromCart(cart, user);
         clearCart();
         setIsCartOpen(false);
-
         success(`${createdTickets.length} ticket(s) généré(s) avec succès.`);
         navigate('/dashboard');
     };
@@ -167,7 +166,7 @@ const CartDrawer = () => {
                                                 {/* Event Image */}
                                                 <div className="relative flex-shrink-0">
                                                     <img
-                                                        src={item.event.images?.main || item.event.image}
+                                                        src={item.event.images?.main || item.event.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=900&h=380&fit=crop'}
                                                         alt={item.event.title}
                                                         className="w-20 h-20 rounded-xl object-cover"
                                                     />

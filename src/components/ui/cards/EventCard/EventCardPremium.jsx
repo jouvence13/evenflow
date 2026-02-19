@@ -105,7 +105,7 @@ const EventCardPremium = ({ event, onClick }) => {
                 <div className="relative h-64 overflow-hidden">
                     {/* Main Image */}
                     <motion.img
-                        src={event.images?.main || event.image}
+                        src={event.images?.main || event.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=900&h=380&fit=crop'}
                         alt={event.title}
                         className="w-full h-full object-cover"
                         animate={{
@@ -201,7 +201,7 @@ const EventCardPremium = ({ event, onClick }) => {
                     {event.organizer && (
                         <div className="flex items-center space-x-3 mb-6">
                             <img
-                                src={event.organizer.logo}
+                                src={event.organizer.logo || 'https://ui-avatars.com/api/?name=Organisateur&background=random'}
                                 alt={event.organizer.name}
                                 className="w-8 h-8 rounded-full border border-gray-200 object-cover"
                             />

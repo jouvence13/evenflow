@@ -88,7 +88,7 @@ const TestimonialsSection = () => {
                                 <div className="relative shrink-0">
                                     <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-red-100">
                                         <img
-                                            src={testimonials[currentIndex].image}
+                                            src={testimonials[currentIndex].image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=900&h=380&fit=crop'}
                                             alt={testimonials[currentIndex].name}
                                             className="w-full h-full object-cover"
                                         />
