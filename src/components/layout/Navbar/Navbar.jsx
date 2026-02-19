@@ -16,6 +16,8 @@ const Navbar = () => {
     const { setIsCartOpen, cartCount } = useCart();
     const location = useLocation();
     const navigate = useNavigate();
+    const isHome = location.pathname === '/';
+    const isOrganizer = user?.role === 'ORGANIZER';
 
     useEffect(() => {
         const handleScroll = () => {
@@ -25,7 +27,7 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const navLinks = [
+    const homeNavLinks = [
         { path: 'home', label: 'Accueil' },
         { path: 'selection', label: 'Sélection' },
         { path: 'about', label: 'À Propos' },
@@ -33,7 +35,30 @@ const Navbar = () => {
         { path: 'contact', label: 'Contact' },
     ];
 
-    const isHome = location.pathname === '/';
+    const organizerUnifiedNavLinks = [
+        { type: 'route', to: '/dashboard/organizer', label: 'Dashboard' },
+        { type: 'route', to: '/dashboard/organizer/events', label: 'Mes Événements' },
+        { type: 'route', to: '/dashboard/organizer/scan', label: 'Scan Tickets' },
+        { type: 'route', to: '/dashboard/organizer/sales', label: 'Ventes Tickets' },
+        { type: 'route', to: '/catalogue', label: 'Catalogue' },
+    ];
+
+    const buyerUnifiedNavLinks = [
+        { type: 'route', to: '/dashboard/buyer', label: 'Dashboard' },
+        { type: 'route', to: '/catalogue', label: 'Catalogue' },
+    ];
+
+    const guestUnifiedNavLinks = [
+        { type: 'route', to: '/catalogue', label: 'Catalogue' },
+    ];
+
+    const navLinks = isHome
+        ? homeNavLinks.map((link) => ({ ...link, type: 'anchor' }))
+        : isOrganizer
+            ? organizerUnifiedNavLinks
+            : user
+                ? buyerUnifiedNavLinks
+                : guestUnifiedNavLinks;
 
     const handleNavClick = (id) => {
         if (!isHome) {
@@ -62,7 +87,7 @@ const Navbar = () => {
 
                         {/* Logo */}
                         <div
-                            onClick={() => handleNavClick('home')}
+                            onClick={() => navigate('/#home')}
                             className="flex items-center gap-2.5 group cursor-pointer"
                         >
                             <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-600/30 group-hover:scale-105 transition-transform duration-300">
@@ -76,13 +101,23 @@ const Navbar = () => {
                         {/* Desktop Navigation */}
                         <div className="hidden lg:flex items-center gap-8">
                             {navLinks.map((link) => (
-                                <button
-                                    key={link.path}
-                                    onClick={() => handleNavClick(link.path)}
-                                    className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-red-600 transition-colors"
-                                >
-                                    {link.label}
-                                </button>
+                                link.type === 'route' ? (
+                                    <button
+                                        key={link.to}
+                                        onClick={() => navigate(link.to)}
+                                        className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-red-600 transition-colors"
+                                    >
+                                        {link.label}
+                                    </button>
+                                ) : (
+                                    <button
+                                        key={link.path}
+                                        onClick={() => handleNavClick(link.path)}
+                                        className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-red-600 transition-colors"
+                                    >
+                                        {link.label}
+                                    </button>
+                                )
                             ))}
                         </div>
 
@@ -138,13 +173,26 @@ const Navbar = () => {
                 <div className="lg:hidden fixed inset-0 z-[45] bg-white flex flex-col pt-24 p-6">
                     <div className="flex flex-col gap-6">
                         {navLinks.map((link) => (
-                            <button
-                                key={link.path}
-                                onClick={() => handleNavClick(link.path)}
-                                className="text-left text-2xl font-black text-dark uppercase tracking-tighter italic border-b border-gray-100 pb-4"
-                            >
-                                {link.label}
-                            </button>
+                            link.type === 'route' ? (
+                                <button
+                                    key={link.to}
+                                    onClick={() => {
+                                        navigate(link.to);
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="text-left text-2xl font-black text-dark uppercase tracking-tighter italic border-b border-gray-100 pb-4"
+                                >
+                                    {link.label}
+                                </button>
+                            ) : (
+                                <button
+                                    key={link.path}
+                                    onClick={() => handleNavClick(link.path)}
+                                    className="text-left text-2xl font-black text-dark uppercase tracking-tighter italic border-b border-gray-100 pb-4"
+                                >
+                                    {link.label}
+                                </button>
+                            )
                         ))}
                     </div>
                     {!user && (

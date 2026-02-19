@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { X, ShoppingBag, Trash2, Plus, Minus, ArrowRight, Sparkles, Lock } from 'lucide-react';
 import { useCart } from '../../../context/CartContext';
+import { useAuth } from '../../../hooks/useAuth';
+import { usePlatform } from '../../../context/PlatformContext';
+import { useToast } from '../../ui/overlays/Toast';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CartDrawer = () => {
     const { cart, removeFromCart, updateQuantity, clearCart, isCartOpen, setIsCartOpen, cartTotal, cartCount } = useCart();
+    const { user } = useAuth();
+    const { purchaseFromCart } = usePlatform();
+    const { success, warning } = useToast();
+    const navigate = useNavigate();
     const [isAnimating, setIsAnimating] = useState(false);
 
     // Animation d'ajout au panier
@@ -56,6 +64,22 @@ const CartDrawer = () => {
     const subtotal = cartTotal;
     const fees = Math.round(subtotal * 0.05); // 5% de frais
     const total = subtotal + fees;
+
+    const handleCheckout = () => {
+        if (!user) {
+            warning('Connectez-vous pour finaliser votre achat.');
+            setIsCartOpen(false);
+            navigate('/login');
+            return;
+        }
+
+        const createdTickets = purchaseFromCart(cart, user);
+        clearCart();
+        setIsCartOpen(false);
+
+        success(`${createdTickets.length} ticket(s) généré(s) avec succès.`);
+        navigate('/dashboard');
+    };
 
     return (
         <AnimatePresence>
@@ -244,12 +268,15 @@ const CartDrawer = () => {
 
                                     {/* Actions */}
                                     <div className="space-y-3">
-                                        <button className="
+                                                                                <button
+                                                                                        onClick={handleCheckout}
+                                                                                        className="
                       w-full py-4 bg-gradient-to-r from-red-600 to-red-500 
                       text-white font-bold rounded-xl hover:shadow-xl 
                       transform hover:-translate-y-0.5 transition-all duration-300
                       flex items-center justify-center space-x-2
-                    ">
+                                        "
+                                                                                >
                                             <span>Procéder au paiement</span>
                                             <ArrowRight className="w-5 h-5" />
                                         </button>

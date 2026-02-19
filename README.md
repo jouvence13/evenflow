@@ -1,14 +1,11 @@
-# Evenflow Frontend
+# Evenflow (Frontend + Backend)
 
-Application frontend de billetterie événementielle construite avec React, Vite et Tailwind CSS.
+Application de billetterie événementielle avec frontend React et backend Node.js + Prisma.
 
 ## Stack technique
 
-- React 18
-- Vite 5
-- React Router DOM 6
-- Tailwind CSS 3
-- Framer Motion
+- Frontend: React 18, Vite 5, React Router DOM 6, Tailwind CSS 3
+- Backend: Express, Prisma, SQLite, JWT, bcrypt
 
 ## Prérequis
 
@@ -17,11 +14,33 @@ Application frontend de billetterie événementielle construite avec React, Vite
 
 ## Installation
 
+### 1) Frontend
+
 ```bash
 npm install
 ```
 
+### 2) Backend
+
+```bash
+cd backend
+npm install
+copy .env.example .env
+npx prisma migrate dev --name init
+```
+
 ## Lancer le projet en local
+
+### Terminal 1 - API
+
+```bash
+cd backend
+npm run dev
+```
+
+API disponible sur `http://localhost:5000`.
+
+### Terminal 2 - Frontend
 
 ```bash
 npm run dev
@@ -38,6 +57,14 @@ Le serveur démarre par défaut sur `http://localhost:5173`.
 - `npm run format` : formate les fichiers avec Prettier
 - `npm run deploy` : build puis déploiement GitHub Pages (si configuré)
 
+### Backend (`backend/package.json`)
+
+- `npm run dev` : démarre l’API en mode développement
+- `npm run start` : démarre l’API en mode production
+- `npm run prisma:migrate` : crée/applique une migration Prisma
+- `npm run prisma:generate` : génère le Prisma Client
+- `npm run prisma:studio` : ouvre Prisma Studio
+
 ## Structure principale
 
 ```text
@@ -52,6 +79,13 @@ src/
 	services/            # Services applicatifs
 	styles/              # Styles globaux Tailwind/CSS
 	utils/               # Utilitaires
+
+backend/
+	prisma/              # Schéma + migrations Prisma
+	src/config/          # Client Prisma
+	src/middleware/      # Middleware auth JWT
+	src/routes/          # Routes API (auth)
+	src/server.js        # Entrée API Express
 ```
 
 ## Routage actuel
@@ -62,23 +96,30 @@ src/
 - `/login` : connexion
 - `/register` : inscription
 
-## Authentification (mode mock)
+## Authentification (backend Prisma)
 
-Le projet utilise actuellement une authentification simulée via `AuthContext` avec persistance locale :
+Le frontend est branché sur l’API backend :
 
-- utilisateur stocké dans `localStorage` sous la clé `evenflow_user`
-- fonctions exposées : `login`, `register`, `logout`
-- redirection automatique après connexion/inscription vers la page d’accueil
+- `POST /api/auth/register` : création de compte avec rôle `BUYER` ou `ORGANIZER`
+- `POST /api/auth/login` : connexion et retour d’un JWT
+- `GET /api/auth/me` : profil utilisateur connecté (JWT requis)
+
+Persistance locale côté frontend :
+
+- token JWT stocké sous la clé `token`
+- utilisateur stocké sous la clé `evenflow_user`
+
+Après connexion/inscription, les deux rôles sont redirigés vers `/` (même flux pour l’instant).
 
 ## Notes de développement
 
-- Les pages d’authentification (`/login`, `/register`) sont fonctionnelles côté frontend.
-- Le backend/API d’auth réel n’est pas encore branché.
+- Les pages `/login` et `/register` sont connectées à l’API backend.
+- L’inscription propose le type de compte `Acheteur` ou `Organisateur`.
 - Le design repose sur des classes utilitaires Tailwind + quelques classes globales définies dans `src/styles/globals.css`.
 
 ## Build vérifié
 
-Le build de production a été validé avec succès via :
+Le build frontend a été validé via :
 
 ```bash
 npm run build

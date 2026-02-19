@@ -2,21 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import EventCardPremium from '../../../components/ui/cards/EventCard/EventCardPremium';
-import { mockEvents, eventCategories } from '../../../mock-data/events';
+import { usePlatform } from '../../../context/PlatformContext';
 
 const EventsPage = () => {
     const navigate = useNavigate();
+    const { allEvents } = usePlatform();
     const [filter, setFilter] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredEvents = mockEvents.filter(event => {
-        const matchesCategory = filter === 'All' || event.category === filter.toLowerCase();
+    const categories = ['All', ...new Set(allEvents.map((event) => String(event.category || '').toLowerCase()).filter(Boolean))];
+
+    const filteredEvents = allEvents.filter(event => {
+        const matchesCategory = filter === 'All' || String(event.category || '').toLowerCase() === filter;
         const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             event.location.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesCategory && matchesSearch;
     });
-
-    const categories = ['All', ...eventCategories.map(c => c.name)];
 
     return (
         <div className="space-y-12 pb-32 bg-white selection:bg-primary selection:text-white">
@@ -57,7 +58,7 @@ const EventsPage = () => {
                             : 'bg-white text-dark/30 border-slate-100 hover:border-primary/20 hover:text-dark'
                             }`}
                     >
-                        {cat}
+                        {cat === 'All' ? 'All' : cat}
                     </button>
                 ))}
             </div>

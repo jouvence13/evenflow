@@ -6,6 +6,7 @@ import AboutSection from '../../../components/sections/AboutSection';
 import FeaturedEvents from '../../../components/sections/FeaturedEvents';
 import HowItWorks from '../../../components/sections/HowItWorks';
 import TestimonialsSection from '../../../components/sections/TestimonialsSection';
+import Newsletter from '../../../components/layout/Newsletter/Newsletter';
 import ScrollIndicator from '../../../components/ui/ScrollIndicator';
 import MagneticButton from '../../../components/ui/buttons/MagneticButton';
 import { ArrowRight } from 'lucide-react';
@@ -99,6 +100,10 @@ const HomePage = () => {
                         </Link>
                     </motion.div>
                 </div>
+            </section>
+
+            <section className="py-24 bg-white">
+                <Newsletter />
             </section>
         </div>
     );

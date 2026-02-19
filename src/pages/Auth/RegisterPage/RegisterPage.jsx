@@ -10,7 +10,8 @@ export default function RegisterPage() {
 		name: '',
 		email: '',
 		password: '',
-		confirmPassword: ''
+		confirmPassword: '',
+		role: 'BUYER'
 	});
 	const [error, setError] = useState('');
 	const [submitting, setSubmitting] = useState(false);
@@ -56,11 +57,12 @@ export default function RegisterPage() {
 			await register({
 				name: formData.name.trim(),
 				email: formData.email.trim(),
-				password: formData.password
+				password: formData.password,
+				role: formData.role
 			});
-			navigate('/', { replace: true });
+			navigate('/dashboard', { replace: true });
 		} catch (submitError) {
-			setError(submitError?.message || 'Échec de création du compte. Réessayez.');
+			setError(submitError?.response?.data?.message || submitError?.message || 'Échec de création du compte. Réessayez.');
 		} finally {
 			setSubmitting(false);
 		}
@@ -104,6 +106,22 @@ export default function RegisterPage() {
 							value={formData.email}
 							onChange={handleChange}
 						/>
+					</div>
+
+					<div>
+						<label htmlFor="role" className="block text-sm font-semibold text-dark mb-2">
+							Type de compte
+						</label>
+						<select
+							id="role"
+							name="role"
+							className="premium-input"
+							value={formData.role}
+							onChange={handleChange}
+						>
+							<option value="BUYER">Acheteur</option>
+							<option value="ORGANIZER">Organisateur</option>
+						</select>
 					</div>
 
 					<div>

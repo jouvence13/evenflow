@@ -1,15 +1,35 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import EventCardPremium from '../ui/cards/EventCard/EventCardPremium';
-import { mockEvents } from '../../mock-data/events';
+import { usePlatform } from '../../context/PlatformContext';
 
 const FeaturedEvents = () => {
     const navigate = useNavigate();
     const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
-    const featured = mockEvents.slice(0, 3);
+    const { allEvents } = usePlatform();
+
+    const featured = useMemo(() => {
+        const now = new Date();
+
+        const availableEvents = allEvents.filter((event) => {
+            const hasTickets = Number(event?.tickets?.available || 0) > 0;
+            const isActive = (event?.status || 'active') === 'active';
+            const hasUpcomingDate = event?.date ? new Date(event.date) >= now : true;
+            return hasTickets && isActive && hasUpcomingDate;
+        });
+
+        const prioritized = availableEvents
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(0, 3);
+
+        return prioritized;
+    }, [allEvents]);
+
+    if (featured.length === 0) {
+        return null;
+    }
 
     return (
         <section className="py-32 relative overflow-hidden bg-white">

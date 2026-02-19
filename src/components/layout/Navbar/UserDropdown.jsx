@@ -1,19 +1,28 @@
 import React from 'react';
-import { LogOut, User as UserIcon, Settings, Heart } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LogOut, User as UserIcon, Heart } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const UserDropdown = ({ user, logout }) => {
+    const navigate = useNavigate();
+    const dashboardPath = user?.role === 'ORGANIZER' ? '/dashboard/organizer' : '/dashboard/buyer';
+    const roleLabel = user?.role === 'ORGANIZER' ? 'Organisateur' : 'Acheteur';
+
+    const handleLogout = () => {
+        logout();
+        navigate('/', { replace: true });
+    };
+
     return (
         <div className="relative group">
             <button className="flex items-center gap-3 p-1 rounded-full hover:bg-gray-100 transition-all">
                 <img
-                    src={user.avatar}
+                    src={user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop'}
                     alt={user.name}
                     className="w-10 h-10 rounded-full border-2 border-primary/20"
                 />
                 <div className="hidden md:block text-left pr-2">
                     <p className="text-sm font-black text-dark leading-none">{user.name}</p>
-                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">{user.role}</p>
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">{roleLabel}</p>
                 </div>
             </button>
 
@@ -23,19 +32,16 @@ const UserDropdown = ({ user, logout }) => {
                     <p className="text-sm font-bold text-dark truncate">{user.email}</p>
                 </div>
                 <div className="p-2">
-                    <Link to="/profile" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-dark/70 hover:text-primary transition-all font-bold text-sm">
-                        <UserIcon className="w-4 h-4" /> Profil
+                    <Link to={dashboardPath} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-dark/70 hover:text-primary transition-all font-bold text-sm">
+                        <UserIcon className="w-4 h-4" /> Dashboard
                     </Link>
-                    <Link to="/favorites" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-dark/70 hover:text-primary transition-all font-bold text-sm">
-                        <Heart className="w-4 h-4" /> Favoris
-                    </Link>
-                    <Link to="/settings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-dark/70 hover:text-primary transition-all font-bold text-sm">
-                        <Settings className="w-4 h-4" /> Paramètres
+                    <Link to="/catalogue" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-dark/70 hover:text-primary transition-all font-bold text-sm">
+                        <Heart className="w-4 h-4" /> Explorer
                     </Link>
                 </div>
                 <div className="p-2 border-t border-slate-50">
                     <button
-                        onClick={logout}
+                        onClick={handleLogout}
                         className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 text-red-500 transition-all font-bold text-sm"
                     >
                         <LogOut className="w-4 h-4" /> Déconnexion

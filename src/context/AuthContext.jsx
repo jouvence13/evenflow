@@ -1,11 +1,13 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useEffect, useState, useContext } from 'react';
+import api from '../api/axios';
+import { getToken, removeToken, setToken } from '../utils/auth';
 
 export const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-    const [loading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(() => {
         try {
             const savedUser = localStorage.getItem('evenflow_user');
@@ -17,38 +19,59 @@ export const AuthProvider = ({ children }) => {
         }
     });
 
-    const login = (email, password) => {
-        const mockUser = {
-            id: 'user-001',
-            email,
-            name: 'John Doe',
-            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop',
-            role: 'admin', // Par défaut pour démo
-            tickets: 3,
-            favorites: ['event-001']
+    useEffect(() => {
+        const hydrateUser = async () => {
+            const token = getToken();
+
+            if (!token) {
+                setUser(null);
+                localStorage.removeItem('evenflow_user');
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const { data } = await api.get('/auth/me');
+                setUser(data.user);
+                localStorage.setItem('evenflow_user', JSON.stringify(data.user));
+            } catch (error) {
+                removeToken();
+                localStorage.removeItem('evenflow_user');
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
         };
 
-        setUser(mockUser);
-        localStorage.setItem('evenflow_user', JSON.stringify(mockUser));
-        return Promise.resolve(mockUser);
+        hydrateUser();
+    }, []);
+
+    const login = async (email, password) => {
+        const { data } = await api.post('/auth/login', {
+            email,
+            password
+        });
+
+        setToken(data.token);
+        setUser(data.user);
+        localStorage.setItem('evenflow_user', JSON.stringify(data.user));
+
+        return data.user;
     };
 
-    const register = (userData) => {
-        const newUser = {
-            id: `user-${Date.now()}`,
-            ...userData,
-            role: 'user',
-            tickets: 0,
-            favorites: []
-        };
+    const register = async (userData) => {
+        const { data } = await api.post('/auth/register', userData);
 
-        setUser(newUser);
-        localStorage.setItem('evenflow_user', JSON.stringify(newUser));
-        return Promise.resolve(newUser);
+        setToken(data.token);
+        setUser(data.user);
+        localStorage.setItem('evenflow_user', JSON.stringify(data.user));
+
+        return data.user;
     };
 
     const logout = () => {
         setUser(null);
+        removeToken();
         localStorage.removeItem('evenflow_user');
     };
 

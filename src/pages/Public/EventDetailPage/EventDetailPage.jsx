@@ -1,32 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Clock, Ticket, ShieldCheck, ArrowLeft, Loader, Plus, Minus, Tag, Zap, Share2, Heart } from 'lucide-react';
+import { Calendar, MapPin, Clock, Ticket, ShieldCheck, ArrowLeft, Loader, Plus, Minus, Users, Zap, Share2, Heart } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useCart } from '../../../context/CartContext';
 import { useToast } from '../../../components/ui/overlays/Toast';
-import { mockEvents } from '../../../mock-data/events';
+import { usePlatform } from '../../../context/PlatformContext';
 
 const EventDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user, isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
     const { addToCart } = useCart();
-    const { success } = useToast();
+    const { success, info } = useToast();
+    const { getEventById, allEvents } = usePlatform();
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [ticketCount, setTicketCount] = useState(1);
-    const [purchasing, setPurchasing] = useState(false);
+    const [selectedTicketIndex, setSelectedTicketIndex] = useState(0);
+    const [selectedImage, setSelectedImage] = useState('');
 
     useEffect(() => {
         setLoading(true);
-        const foundEvent = mockEvents.find(e => e.id === id) || mockEvents[0];
+        const foundEvent = getEventById(id) || allEvents[0] || null;
         setEvent(foundEvent);
+        if (foundEvent) {
+            const defaultImage = foundEvent?.images?.main || foundEvent?.image || '';
+            setSelectedImage(defaultImage);
+            setSelectedTicketIndex(0);
+            setTicketCount(1);
+        }
         setLoading(false);
         window.scrollTo(0, 0);
-    }, [id]);
+    }, [id, getEventById, allEvents]);
 
     const handleAddToCart = () => {
-        addToCart(event, event.tickets.types[0], ticketCount);
+        if (!isAuthenticated) {
+            info('Connectez-vous pour réserver vos tickets.');
+            navigate('/login');
+            return;
+        }
+
+        addToCart(event, selectedTicketType, ticketCount);
         success(`${ticketCount} ticket(s) ajouté(s) au panier !`);
     };
 
@@ -45,12 +59,29 @@ const EventDetailPage = () => {
         </div>
     );
 
+    const galleryImages = [
+        event?.images?.main || event?.image,
+        ...(event?.images?.gallery || [])
+    ].filter(Boolean);
+
+    const ticketTypes = event?.tickets?.types?.length > 0
+        ? event.tickets.types
+        : [{ id: 'default-ticket', name: 'Standard', price: event?.price || 0, quantity: event?.tickets?.total || 100, sold: event?.tickets?.sold || 0, benefits: ['Accès à l’événement'] }];
+
+    const selectedTicketType = ticketTypes[Math.min(selectedTicketIndex, ticketTypes.length - 1)];
+    const availableForType = Math.max((selectedTicketType?.quantity || 0) - (selectedTicketType?.sold || 0), 0);
+    const maxAllowed = Math.min(10, Math.max(1, availableForType || 1));
+    const totalPrice = (selectedTicketType?.price || 0) * ticketCount;
+    const soldPercent = selectedTicketType?.quantity
+        ? Math.round(((selectedTicketType?.sold || 0) / selectedTicketType.quantity) * 100)
+        : 0;
+
     return (
         <div className="pb-32 bg-white selection:bg-primary selection:text-white">
             {/* Hero Banner Section */}
             <div className="relative h-[60vh] w-full overflow-hidden">
                 <img
-                    src={event.images.main}
+                    src={selectedImage || event?.images?.main || event?.image}
                     alt={event.title}
                     className="w-full h-full object-cover"
                 />
@@ -95,6 +126,23 @@ const EventDetailPage = () => {
             <div className="container mx-auto px-4 mt-20">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
                     <div className="lg:col-span-8 space-y-20">
+                        {galleryImages.length > 1 && (
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-black text-dark uppercase italic tracking-tight">Galerie</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {galleryImages.map((imageUrl) => (
+                                        <button
+                                            key={imageUrl}
+                                            onClick={() => setSelectedImage(imageUrl)}
+                                            className={`rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === imageUrl ? 'border-primary shadow-lg shadow-primary/20' : 'border-gray-100 hover:border-primary/30'}`}
+                                        >
+                                            <img src={imageUrl} alt={event.title} className="w-full h-28 object-cover" />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic">
                             <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-primary shadow-xl shadow-dark/5">
@@ -133,6 +181,19 @@ const EventDetailPage = () => {
                             </div>
                         </div>
 
+                        {event?.tags?.length > 0 && (
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-black text-dark uppercase italic tracking-tight">Tags</h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {event.tags.map((tag) => (
+                                        <span key={tag} className="px-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-600">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="flex items-center gap-8 p-10 glass-panel rounded-[3rem] border-slate-100">
                             <img src={event.organizer.logo} alt={event.organizer.name} className="w-24 h-24 rounded-3xl object-cover shadow-2xl" />
                             <div className="space-y-2">
@@ -153,16 +214,60 @@ const EventDetailPage = () => {
                                 <p className="text-xs text-dark/30 font-bold uppercase tracking-widest">Tickets digitaux immédiats</p>
                             </div>
 
+                            <div className="space-y-3">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-dark/40">Type de ticket</p>
+                                <div className="space-y-3">
+                                    {ticketTypes.map((ticketType, index) => (
+                                        <button
+                                            key={ticketType.id}
+                                            onClick={() => {
+                                                setSelectedTicketIndex(index);
+                                                setTicketCount(1);
+                                            }}
+                                            className={`w-full text-left p-4 rounded-2xl border transition-all ${selectedTicketIndex === index ? 'border-primary bg-primary/5' : 'border-gray-200 bg-white hover:border-primary/30'}`}
+                                        >
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-black text-dark">{ticketType.name}</span>
+                                                <span className="font-black text-primary">{Number(ticketType.price || 0).toLocaleString()} FCFA</span>
+                                            </div>
+                                            <p className="text-xs text-gray-500 mt-1">{Math.max((ticketType.quantity || 0) - (ticketType.sold || 0), 0)} places restantes</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             <div className="space-y-6">
                                 <div className="flex justify-between items-center p-6 bg-slate-50 rounded-3xl">
                                     <span className="text-xs font-black uppercase tracking-widest text-dark/40 italic">Prix Unit.</span>
-                                    <span className="text-2xl font-black italic">{event.tickets.types[0].price.toLocaleString()} FCFA</span>
+                                    <span className="text-2xl font-black italic">{Number(selectedTicketType.price || 0).toLocaleString()} FCFA</span>
                                 </div>
+
+                                <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">
+                                    <div className="flex items-center justify-between text-xs font-black uppercase tracking-widest text-dark/40">
+                                        <span>Disponibilité</span>
+                                        <span>{availableForType} / {selectedTicketType.quantity || 0}</span>
+                                    </div>
+                                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                        <div className="h-full bg-gradient-to-r from-primary to-red-400" style={{ width: `${Math.max(5, 100 - soldPercent)}%` }} />
+                                    </div>
+                                    <p className="text-xs text-gray-500 flex items-center gap-1"><Users className="w-3 h-3" />{soldPercent}% déjà réservé</p>
+                                </div>
+
+                                {selectedTicketType?.benefits?.length > 0 && (
+                                    <div className="rounded-2xl border border-gray-100 bg-white p-4">
+                                        <p className="text-xs font-black uppercase tracking-widest text-dark/40 mb-2">Inclus</p>
+                                        <ul className="space-y-2 text-sm text-gray-600">
+                                            {selectedTicketType.benefits.map((benefit) => (
+                                                <li key={benefit} className="flex items-start gap-2"><ShieldCheck className="w-4 h-4 text-primary mt-0.5" />{benefit}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
 
                                 <div className="space-y-4">
                                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-dark/40">
                                         <span>Quantité</span>
-                                        <span>Max. 10</span>
+                                        <span>Max. {maxAllowed}</span>
                                     </div>
                                     <div className="flex items-center justify-between p-2 bg-slate-100 rounded-3xl">
                                         <button
@@ -173,7 +278,7 @@ const EventDetailPage = () => {
                                         </button>
                                         <span className="text-3xl font-black italic">{ticketCount}</span>
                                         <button
-                                            onClick={() => setTicketCount(Math.min(10, ticketCount + 1))}
+                                            onClick={() => setTicketCount(Math.min(maxAllowed, ticketCount + 1))}
                                             className="w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center text-dark hover:bg-primary hover:text-white transition-all scale-90"
                                         >
                                             <Plus className="w-6 h-6" />
@@ -185,16 +290,16 @@ const EventDetailPage = () => {
                             <div className="pt-8 border-t border-slate-100">
                                 <div className="flex justify-between items-center mb-10">
                                     <span className="text-sm font-black uppercase tracking-widest text-dark/40">Total</span>
-                                    <span className="text-4xl font-black italic text-primary">{(event.tickets.types[0].price * ticketCount).toLocaleString()} FCFA</span>
+                                    <span className="text-4xl font-black italic text-primary">{totalPrice.toLocaleString()} FCFA</span>
                                 </div>
 
                                 <button
                                     onClick={handleAddToCart}
-                                    disabled={purchasing}
+                                    disabled={availableForType <= 0}
                                     className="w-full btn-premium py-6 flex items-center justify-center gap-4 group"
                                 >
-                                    {purchasing ? (
-                                        <Loader className="w-7 h-7 animate-spin" />
+                                    {availableForType <= 0 ? (
+                                        <span>COMPLET</span>
                                     ) : (
                                         <>
                                             <Zap className="w-6 h-6 fill-current group-hover:animate-pulse" />

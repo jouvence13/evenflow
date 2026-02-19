@@ -35,9 +35,9 @@ export default function LoginPage() {
 			setSubmitting(true);
 			setError('');
 			await login(formData.email.trim(), formData.password);
-			navigate('/', { replace: true });
+			navigate('/dashboard', { replace: true });
 		} catch (submitError) {
-			setError(submitError?.message || 'Échec de connexion. Réessayez.');
+			setError(submitError?.response?.data?.message || submitError?.message || 'Échec de connexion. Réessayez.');
 		} finally {
 			setSubmitting(false);
 		}
