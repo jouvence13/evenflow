@@ -1,6 +1,17 @@
 # Evenflow (Frontend + Backend)
 
 Application de billetterie événementielle avec frontend React et backend Node.js + Prisma.
+<img width="1920" height="961" alt="image" src="https://github.com/user-attachments/assets/0b2161c5-5179-476f-883c-a62a827a91ea" />
+<img width="1920" height="959" alt="image" src="https://github.com/user-attachments/assets/284921bc-9901-4669-842f-c46c71f50d35" />
+<img width="1920" height="957" alt="image" src="https://github.com/user-attachments/assets/d976401e-d55f-4fd5-8845-f6b2af67f80a" />
+<img width="1920" height="959" alt="image" src="https://github.com/user-attachments/assets/9acf7474-bfeb-4759-b248-57a97fd5076c" />
+<img width="1920" height="958" alt="image" src="https://github.com/user-attachments/assets/fb8eac02-fe05-4f1f-9abc-c2e24af67b33" />
+<img width="1920" height="958" alt="image" src="https://github.com/user-attachments/assets/e1eef103-8624-46ec-818a-f66cd4c9b71e" />
+<img width="1920" height="958" alt="image" src="https://github.com/user-attachments/assets/6c5be03e-df63-4caf-87ff-6958fcc72b1c" />
+<img width="1920" height="956" alt="image" src="https://github.com/user-attachments/assets/061b7607-f9ed-48a5-82ec-c75878140dc9" />
+<img width="1920" height="961" alt="image" src="https://github.com/user-attachments/assets/ef87a477-ba3b-4842-b6d1-bd4168096753" />
+
+
 
 ## Stack technique
 
